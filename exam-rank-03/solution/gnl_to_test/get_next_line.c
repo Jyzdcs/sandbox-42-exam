@@ -1,7 +1,8 @@
+#include <stdlib.h>
+#include <unistd.h>
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 5
 #endif
-#include "get_next_line.h"
 
 char	*get_next_line(int fd)
 {
