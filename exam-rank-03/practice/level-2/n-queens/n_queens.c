@@ -57,7 +57,7 @@ int	main(int ac, char **av)
 	{
 		if (atoi(av[1]) <= 2)
 		{
-			ftprintf(stdout, "\n");
+			fprintf(stdout, "\n");
 			return (0);
 		}
 		solve(atoi(av[1]), 0);
