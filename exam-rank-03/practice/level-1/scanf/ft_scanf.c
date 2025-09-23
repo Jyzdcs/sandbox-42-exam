@@ -4,73 +4,91 @@
 
 int	match_space(FILE *f)
 {
-	// You may insert code here
-	return (0);
+	int	c;
+
+	while (isspace(c = fgetc(f)) && c != EOF)
+		;
+	if (c == EOF)
+		return (-1);
+	ungetc(c, f);
+	return (1);
 }
 
 int	match_char(FILE *f, char c)
 {
-	// You may insert code here
+	int	input;
+
+	input = fgetc(f);
+	if (input == c)
+		return (1);
+	else if (input == EOF)
+		return (-1);
 	return (0);
 }
 
 int	scan_char(FILE *f, va_list ap)
 {
+	int		c;
+	char	*ptr;
+
+	c = fgetc(f);
+	if (c != EOF)
+	{
+		ptr = va_arg(ap, char *);
+		*ptr = c;
+		return (1);
+	}
 	return (-1);
 }
 
 int	scan_int(FILE *f, va_list ap)
 {
-	int	i;
+	int	nb;
 	int	c;
 	int	*ptr;
-	int	count;
 	int	sign;
+	int	i;
 
-	ptr = va_arg(ap, int *);
-	count = 0;
+	nb = 0;
 	sign = 1;
 	i = 0;
-	c = fgetc(f);
-	if (c == '-')
+	if ((c = fgetc(f)) == '-')
 		sign = -1;
 	else if (c == '+')
 		sign = 1;
 	else if (c == EOF)
 		return (-1);
+	else if (!isdigit(c))
+		return (0);
 	else
 		ungetc(c, f);
+	ptr = va_arg(ap, int *);
 	while (isdigit(c = fgetc(f)) && c != EOF)
 	{
-		printf("\n%d: %c\n", count, c);
-		i = i * 10 + (c - '0');
-		count++;
+		nb = nb * 10 + (c - '0');
+		i++;
 	}
-	if (count == 0)
-		return (0);
-	*ptr = i * sign;
+	if (c != EOF)
+		ungetc(c, f);
+	*ptr = nb * sign;
+	printf("RETURNED\n");
 	return (1);
 }
 
 int	scan_string(FILE *f, va_list ap)
 {
-	int		c;
 	char	*ptr;
-	int		read;
+	int		c;
 	int		i;
 
-	read = 0;
 	i = 0;
-	ptr = va_arg(ap, char *);
-	while ((c = fgetc(f)))
-	{
-		ptr[i++] = c;
-		read++;
-	}
-	if (c == EOF)
+	if ((c = fgetc(f)) == EOF)
 		return (-1);
-	if (read == 0)
-		return (0);
+	ptr = va_arg(ap, char *);
+	ungetc(c, f);
+	while ((c = fgetc(f)) != EOF && !isspace(c))
+		ptr[i++] = c;
+	ptr[i] = '\0';
 	return (1);
 }
 
@@ -138,27 +156,17 @@ int	ft_scanf(const char *format, ...)
 	return (ret);
 }
 
-int	main(void)
+int	main(int ac, char **av)
 {
-	int		age;
-	char	name[50] = {0};
-	char	grade;
-	int		result;
+	char c;
+	int nb_1 = 0;
+	int nb_2 = 0;
+	char str[100];
 
-	grade = '1';
-	printf("=== TESTS SIMPLES DE FT_SCANF ===\n\n");
-	scanf("%s", name);
-	printf("%s\n", name);
-	// TEST 1: Un seul entier
-	// printf("1. Entrez votre âge: ");
-	// result = ft_scanf("%d", &age);
-	// printf("   Résultat: %d conversion, âge = %d\n", result, age);
-	// printf("2. Entrez votre nom: ");
-	// result = ft_scanf("%s", name);
-	// printf("   Résultat: %d conversion, nom = '%s'\n", result, name);
-	// printf("3. Entrez âge et nom ensemble: ");
-	// result = ft_scanf("%d %s", &age, name);
-	// printf("Adresse de age: %p\n", &age);
-	// printf("Adresse de name: %p\n", name);
-	return (0);
+	// ft_scanf("%s %d", str, &nb);
+	// printf("%s %d", str, nb);
+	// ft_scanf("%d %d", &nb_1, &nb_2);
+	ft_scanf("%d %d", &nb_1, &nb_2);
+	printf("%d", nb_1);
+	// printf("%d %d", nb_1, nb_2);
 }

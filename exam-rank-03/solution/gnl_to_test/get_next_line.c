@@ -86,14 +86,16 @@ char	*ft_strdup(char *src)
 char	*get_next_line(int fd)
 {
 	static char	buffer[BUFFER_SIZE];
-	char		line[70000];
 	static int	buffer_read;
+	static int	buffer_pos;
+	char		line[70000];
+	int			i;
 
-	// Buffer statique : garde les données entre appels
-	// Buffer temporaire pour construire la ligne
-	// Statique : nombre de chars lus dans buffer
-	static int buffer_pos; // Statique : position actuelle dans buffer
-	int i;                 // Index pour construire la ligne
+	// buffer_pos : position actuelle dans buffer
+	// i					: Index pour construire la ligne
+	// line				: garde les données entre appels
+	// buffer			: temporaire pour construire la ligne
+	// buffer_read	: Statique nombre de chars lus dans buffer
 	i = 0;
 	// Étape 1 : Vérifications de sécurité
 	if (fd < 0 || BUFFER_SIZE <= 0)

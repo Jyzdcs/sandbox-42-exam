@@ -3,56 +3,52 @@
 
 static int	board[20];
 
-static void	print_solution(int n)
+void	print_solution(int queens)
 {
 	int	i;
 
-	for (i = 0; i < n; i++)
+	i = 0;
+	while (i < queens)
 	{
 		fprintf(stdout, "%d", board[i]);
-		if (i < n - 1)
+		if (i + 1 != queens)
 			fprintf(stdout, " ");
+		i++;
 	}
 	fprintf(stdout, "\n");
 }
 
-static int	ft_abs(int n)
-{
-	if (n < 0)
-		return (-n);
-	return (n);
-}
-
-static int	is_safe(int row, int col)
+int	check_placement(int queens, int row, int col)
 {
 	int	i;
 
 	i = 0;
 	while (i < col)
 	{
-		if (board[i] == row || ft_abs(board[i] - row) == ft_abs(i - col))
+		if (board[i] == row || (board[i] + col == row + i) || (i
+				+ board[i] == row + col))
 			return (0);
 		i++;
 	}
 	return (1);
 }
 
-static void	solve(int col, int n)
+void	n_queens(int queens, int col)
 {
 	int	row;
 
-	if (col >= n)
+	row = 0;
+	if (col == queens)
 	{
-		print_solution(n);
+		print_solution(queens);
 		return ;
 	}
-	row = 0;
-	while (row < n)
+	while (row < queens)
 	{
-		if (is_safe(row, col))
+		if (check_placement(queens, row, col))
 		{
 			board[col] = row;
-			solve(col + 1, n);
+			n_queens(queens, col + 1);
 		}
 		row++;
 	}
@@ -60,13 +56,15 @@ static void	solve(int col, int n)
 
 int	main(int ac, char **av)
 {
-	int n;
-
-	if (ac != 2)
-		return (1);
-	n = atoi(av[1]);
-	if (n <= 0 || n > 20)
-		return (1);
-	solve(0, n);
-	return (0);
+	if (ac == 2)
+	{
+		if (atoi(av[1]) <= 2)
+		{
+			fprintf(stdout, "\n");
+			return (0);
+		}
+		n_queens(atoi(av[1]), 0);
+		return (0);
+	}
+	return (1);
 }

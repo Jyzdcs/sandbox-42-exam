@@ -30,6 +30,7 @@ void	sort(char *s)
 		i++;
 	}
 }
+
 void	permute_swap(char *s, int start, int len)
 {
 	int	i;

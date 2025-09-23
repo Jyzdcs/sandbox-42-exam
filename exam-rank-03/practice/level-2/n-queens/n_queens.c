@@ -11,43 +11,46 @@ void	print_solution(int queens)
 	while (i < queens)
 	{
 		fprintf(stdout, "%d", board[i]);
-		fprintf(stdout, " ");
+		if (i + 1 != queens)
+			fprintf(stdout, " ");
 		i++;
 	}
 	fprintf(stdout, "\n");
 }
 
-int	valide_pos(int queens, int row)
+int	check_placement(int queens, int row, int col)
 {
 	int	i;
 
 	i = 0;
-	while (i < row)
+	while (i < col)
 	{
-		if ((board[i] == board[row]) || (row - board[row] == i - board[i])
-			|| (row + board[row] == i + board[i]))
+		if (board[i] == row || (board[i] + col == row + i) || (i
+				+ board[i] == row + col))
 			return (0);
 		i++;
 	}
 	return (1);
 }
 
-void	solve(int queens, int row)
+void	n_queens(int queens, int col)
 {
-	int	i;
+	int	row;
 
-	if (row == queens)
+	row = 0;
+	if (col == queens)
 	{
 		print_solution(queens);
 		return ;
 	}
-	i = 0;
-	while (i < queens)
+	while (row < queens)
 	{
-		board[row] = i;
-		if (valide_pos(queens, row))
-			solve(queens, row + 1);
-		i++;
+		if (check_placement(queens, row, col))
+		{
+			board[col] = row;
+			n_queens(queens, col + 1);
+		}
+		row++;
 	}
 }
 
@@ -60,7 +63,8 @@ int	main(int ac, char **av)
 			fprintf(stdout, "\n");
 			return (0);
 		}
-		solve(atoi(av[1]), 0);
+		n_queens(atoi(av[1]), 0);
+		return (0);
 	}
-	return (0);
+	return (1);
 }

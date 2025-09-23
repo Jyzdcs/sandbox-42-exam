@@ -1,13 +1,15 @@
 #include <stdio.h>
 
-int	is_val(char *str)
+int	is_unbalanced(char *str)
 {
 	int	opened;
 	int	closed;
+	int	i;
 
 	opened = 0;
 	closed = 0;
-	for (int i = 0; str[i]; i++)
+	i = 0;
+	while (str[i])
 	{
 		if (str[i] == '(')
 			opened++;
@@ -18,33 +20,39 @@ int	is_val(char *str)
 			else
 				closed++;
 		}
+		i++;
 	}
 	return (opened + closed);
 }
 
-void	rip(char *str, int must_fic, int n_fix, int pos)
+void	rip(char *str, int m_fix, int n_fix, int pos)
 {
-	int	c;
+	int		i;
+	char	c;
 
-	if (must_fic == n_fix && !is_val(str))
+	i = pos;
+	if (m_fix == n_fix && !is_unbalanced(str))
 	{
 		puts(str);
 		return ;
 	}
-	for (int i = pos; str[i]; i++)
+	while (str[i])
 	{
 		if (str[i] == '(' || str[i] == ')')
 		{
 			c = str[i];
-			str[i] = ' ';
-			rip(str, must_fic, n_fix + 1, i);
+			str[i] = '_';
+			rip(str, m_fix + 1, n_fix, i);
 			str[i] = c;
 		}
+		i++;
 	}
 }
 
-int	main(int ac, char **ag)
+int	main(int ac, char **av)
 {
-	int m_fix = is_val(ag[1]);
-	rip(ag[1], m_fix, 0, 0);
+	if (ac == 2)
+	{
+		rip(av[1], 0, is_unbalanced(av[1]), 0);
+	}
 }
