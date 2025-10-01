@@ -1,64 +1,83 @@
-#include "microshell.h"
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-int err(char *str) 
+void	ft_putstr_fd2(char *s, char *arg)
 {
-    while (*str)
-        write(2, str++, 1);
-    return 1;
+	int	i;
+
+	i = 0;
+	while (s[i])
+		write(2, &s[i++], 1);
+	i = 0;
+	if (arg)
+		while (arg[i])
+			write(2, &arg[i++], 1);
+	write(2, "\n", 1);
 }
 
-int cd(char **argv, int i) 
+void	ft_exec(char **av, int input_fd, int i, char **envp)
 {
-    if (i != 2)
-        return err("error: cd: bad arguments\n");
-    else if (chdir(argv[1]) == -1)
-        return err("error: cd: cannot change directory to "), err(argv[1]), err("\n");
-    return 0;
+	av[i] = NULL;
+	dup2(input_fd, STDIN_FILENO);
+	close(input_fd);
+	execve(av[0], av, envp);
+	ft_putstr_fd2("error cmd ", av[0]);
+	exit(EXIT_FAILURE);
 }
 
-int exec(char **argv, char **envp, int i) 
+int	main(int ac, char **av, char **envp)
 {
-    int fd[2];
-    int status;
-    int has_pipe = argv[i] && !strcmp(argv[i], "|");
+	int i = 0;
+	int input_fd = dup(STDIN_FILENO);
+	int fd[2];
 
-    if (has_pipe && pipe(fd) == -1)
-        return err("error: fatal\n");
-
-    int pid = fork();
-    if (!pid) 
-    {
-        argv[i] = 0;
-        if (has_pipe && (dup2(fd[1], 1) == -1 || close(fd[0]) == -1 || close(fd[1]) == -1))
-            return err("error: fatal\n");
-        execve(*argv, argv, envp);
-        return err("error: cannot execute "), err(*argv), err("\n");
-    }
-
-    waitpid(pid, &status, 0);
-    if (has_pipe && (dup2(fd[0], 0) == -1 || close(fd[0]) == -1 || close(fd[1]) == -1))
-        return err("error: fatal\n");
-    return WIFEXITED(status) && WEXITSTATUS(status);
-}
-
-int main(int argc, char **argv, char **envp) 
-{
-    int    i = 0;
-    int    status = 0;
-
-    if (argc > 1) 
-    {
-        while (argv[i] && argv[++i]) 
-        {
-            argv += i;
-            i = 0;
-            while (argv[i] && strcmp(argv[i], "|") && strcmp(argv[i], ";"))
-                i++;
-            if (!strcmp(*argv, "cd"))
-                status = cd(argv, i);
-            else if (i)
-                status = exec(argv, envp, i);
-        }
-    }
-    return status;
+	(void)ac;
+	while (av[i] && av[i + 1])
+	{
+		av = &av[i + 1];
+		i = 0;
+		while (av[i] && strcmp(av[i], ";") && strcmp(av[i], "|"))
+			i++;
+		if (!strcmp(av[0], "cd"))
+		{
+			if (i != 2)
+				ft_putstr_fd2("Wrong arg num ", NULL);
+			else if (chdir(av[1]) != 0)
+				ft_putstr_fd2("Wrong path ", av[1]);
+		}
+		else if (i != 0 && (av[i] == NULL || !strcmp(av[i], ";")))
+		{
+			if (fork() == 0)
+				ft_exec(av, input_fd, i, envp);
+			else
+			{
+				close(input_fd);
+				while (waitpid(-1, NULL, WUNTRACED) != -1)
+					;
+				input_fd = dup(STDIN_FILENO);
+			}
+		}
+		else if (i != 0 && !strcmp(av[i], "|"))
+		{
+			pipe(fd);
+			waitpid(-1, NULL, WUNTRACED);
+			if (fork() == 0)
+			{
+				dup2(fd[1], STDOUT_FILENO);
+				close(fd[0]);
+				close(fd[1]);
+				ft_exec(av, input_fd, i, envp);
+			}
+			else
+			{
+				close(fd[1]);
+				close(input_fd);
+				input_fd = fd[0];
+			}
+		}
+	}
+	close(input_fd);
+	return (0);
 }

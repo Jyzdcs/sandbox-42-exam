@@ -1,6 +1,9 @@
 Assignment name  : microshell
 Expected files   : microshell.c
-Allowed functions: malloc, free, write, close, fork, waitpid, signal, kill, exit, chdir, execve, dup, dup2, pipe, strcmp, strncmp
+Allowed functions: 
+
+malloc, free, write, close, fork, waitpid, signal, 
+kill, exit, chdir, execve, dup, dup2, pipe, strcmp, strncmp
 --------------------------------------------------------------------------------------
 
 Écrivez un programme qui se comportera comme l'exécution d'une commande shell
